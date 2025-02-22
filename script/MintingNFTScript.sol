@@ -5,7 +5,6 @@ import {Script} from "forge-std/Script.sol";
 import {CertificateNFT} from "../src/CertificateNFT.sol";
 
 contract MintingNFTScript is Script {
-
     function run() external {
         vm.startBroadcast();
 
