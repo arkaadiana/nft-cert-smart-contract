@@ -1,66 +1,100 @@
-## Foundry
+# Certificate NFT Smart Contract
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Overview
 
-Foundry consists of:
+This project implements a **Certificate NFT Smart Contract** using **Solidity** and **Foundry**. It allows the contract owner to mint NFTs representing digital certificates, preventing unauthorized transfers or approvals.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Features
+- **ERC721-based Soulbound Certificate NFTs**
+- **OnlyOwner Minting**: Only the contract owner can mint new certificates.
+- **Soulbound Mechanism**: NFTs cannot be transferred, ensuring authenticity.
+- **Metadata Storage**: Stores metadata in a Base64-encoded JSON format.
+- **Test Suite**: Includes tests for minting and security constraints using Foundry.
 
-## Documentation
+## Dependencies
+This project uses OpenZeppelin libraries and Foundry for development. Ensure you have:
+- **Foundry** installed ([Installation Guide](https://book.getfoundry.sh/getting-started/installation.html))
+- **Solidity 0.8.13** or higher
 
-https://book.getfoundry.sh/
+## Installation
+```sh
+# Install Foundry
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
 
 ## Usage
 
 ### Build
-
-```shell
-$ forge build
+```sh
+forge build
 ```
 
-### Test
-
-```shell
-$ forge test
+### Run Tests
+```sh
+forge test
 ```
 
-### Format
-
-```shell
-$ forge fmt
+### Format Code
+```sh
+forge fmt
 ```
 
 ### Gas Snapshots
-
-```shell
-$ forge snapshot
+```sh
+forge snapshot
 ```
 
-### Anvil
-
-```shell
-$ anvil
+### Local Blockchain Node
+```sh
+anvil
 ```
 
-### Deploy
+### Deployment & Execution
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+After setting up environment variables in `.env`, use the following commands to execute various operations:
+
+```sh
+# Build the smart contract
+forge build
+
+# Run tests
+forge test
+
+# Load environment variables
+source .env
+
+# Deploy contract
+forge create --rpc-url $RPC_URL --private-key $PRIVATE_KEY src/CertificateNFT.sol:CertificateNFT \
+  --gas-limit 10000000 --gas-price 1000000000 --broadcast --verify \
+  --verifier blockscout --verifier-url https://niskala.mandalachain.io/api \
+  --optimize --optimizer-runs 200
+
+# Run minting script
+forge script --rpc-url $RPC_URL --private-key $PRIVATE_KEY script/MintingNFTScript.sol:MintingNFTScript --broadcast
 ```
 
-### Cast
+## Contract Details
+### `CertificateNFT.sol`
+The `CertificateNFT` contract:
+- Uses **ERC721URIStorage** for storing metadata.
+- Implements **Ownable** to restrict minting access.
+- Implements **Soulbound Mechanism** by overriding `transferFrom`, `approve`, and `setApprovalForAll` to disable transfers.
+- Generates Base64-encoded metadata dynamically.
 
-```shell
-$ cast <subcommand>
+### `MintingNFTScript.sol`
+- This script allows the contract owner to mint new NFTs using Foundry scripts.
+- Calls the `mintingNFT` function from `CertificateNFT.sol`.
+
+## Running Tests
+```sh
+forge test
 ```
+### Test Cases:
+- **Minting NFT** (`testMintNFT`) ensures the owner can successfully mint an NFT.
+- **Soulbound Restriction** (`testCannotTransfer`) verifies that NFTs cannot be transferred.
+- **Approval Restrictions** (`testCannotApprove`, `testCannotSetApprovalForAll`) confirm that approvals are blocked.
 
-### Help
+## License
+This project is licensed under the **[MIT License](LICENSE)**.
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
